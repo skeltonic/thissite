@@ -1,0 +1,35 @@
+﻿@model Cart
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+@if (Model.CartItems.Count == 0)
+{
+    <p>You have no items in your cart!</p>
+    <a asp-action="Index" asp-controller="Home">Go Home</a>
+}
+else
+{
+    <table class="table table-striped">
+        @foreach (var item in Model.CartItems)
+        {
+            <tr>
+                <td>@item.Product.Name</td>
+                <td>@item.Product.Description</td>
+                <td><img src="@item.Product.Image" class="img-fluid" /></td>
+                <td>@((item.Product.Price ?? 0).ToString("c"))</td>
+                <td>@item.Quantity</td>
+                <td>@((item.Quantity * (item.Product.Price ?? 0)).ToString("c"))</td>
+                <td>
+                    <form method="post" asp-action="remove">
+                        <input type="hidden" name="id" value="@item.ID" />
+                        <input type="submit" value="Remove" class="btn btn-primary" />
+                    </form>
+                </td>
+            </tr>
+
+        }
+    </table>
+    <a asp-action="index" asp-controller="checkout" class="btn btn-primary">Checkout</a>
+}

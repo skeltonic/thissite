@@ -6,6 +6,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using thissite.Models;
+using Newtonsoft.Json.Serialization;
+
 
 namespace thissite
 {
@@ -21,11 +27,47 @@ namespace thissite
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            string ThisSiteConnectionString = Configuration.GetConnectionString("ThisSite");
+            services.AddDbContext<ThisSiteDbContext>(opt => opt.UseSqlServer(ThisSiteConnectionString));
+
+            services.AddIdentity<ThisSiteUser, IdentityRole>(options =>
+            {
+                options.Password.RequireDigit = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+            })
+                .AddEntityFrameworkStores<ThisSiteDbContext>()
+                .AddDefaultTokenProviders();
+
+            services
+                .AddMvc()
+                .AddJsonOptions(
+                    options =>
+                    {
+                    options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                    });
+
+            services.AddTransient((x) => { return new EmailService(Configuration["SendGridKey"]); });
+            services.AddTransient((x) => {
+                return new Braintree.BraintreeGateway(
+                    Configuration["BraintreeEnvironment"],
+                    Configuration["BraintreeMerchantId"],
+                    Configuration["BraintreePublicKey"],
+                    Configuration["BraintreePrivateKey"]);
+            });
+            services.AddTransient((x) =>
+            {
+                SmartyStreets.ClientBuilder builder = new SmartyStreets.ClientBuilder(
+                    Configuration["d6eaef69-4aa6-912c-d242-490f76ffe875"], 
+                    Configuration["50dtHlWwG86EmKAYQ8BK"]);
+                return builder.BuildUsStreetApiClient();
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ThisSiteDbContext db)
         {
             if (env.IsDevelopment())
             {
@@ -36,6 +78,7 @@ namespace thissite
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+            app.UseAuthentication();
 
             app.UseStaticFiles();
 
@@ -45,6 +88,8 @@ namespace thissite
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+            
+            db.Initialize();
         }
     }
 }

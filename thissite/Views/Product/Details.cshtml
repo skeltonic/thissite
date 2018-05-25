@@ -1,0 +1,34 @@
+﻿@model Product
+@{
+    ViewData["Title"] = "Details";
+}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Product" asp-action="Index">Shop</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-sm-12 col-md-4">
+        <img class="img-fluid" src="@Model.Image" alt="@Model.Name" />
+    </div>
+    <div class="col-sm-12 col-md-8">
+        <h2>@Model.Name</h2>
+
+        <p>@Model.Description</p>
+        <h4>@(Model.Price.HasValue ? Model.Price.Value.ToString("C") : "No Price")</h4>
+        <form method="post">
+            <input asp-for="ID" type="hidden" />
+            <select name="quantity">
+                @for (int i = 0; i < 10; i++)
+                {
+                    <option value="@i">@i</option>
+                }
+
+            </select>
+            <input type="submit" class="btn btn-primary" value="Add to Cart" />
+        </form>
+    </div>
+</div>

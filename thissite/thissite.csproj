@@ -2,10 +2,19 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <UserSecretsId>3a7c3f11-0e59-411d-9bc3-c0c725d8da06</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.6" />
+    <PackageReference Include="Braintree" Version="4.4.0" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.0.3" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.4" />
+    <PackageReference Include="Sendgrid" Version="9.9.0" />
+    <PackageReference Include="smartystreets-dotnet-sdk" Version="8.0.7" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,0 +1,278 @@
+﻿@model CheckoutViewModel
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Checkout</h2>
+<div class="row">
+    <div class="col-8">
+        <div class="progress">
+            <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <div asp-validation-summary="All"></div>
+        <form method="post" id="checkout">
+            <div class="card">
+                <div class="card-header" data-toggle="collapse" data-target="#contact">
+                    <h5 class="card-title">Contact</h5>
+                </div>
+                <div class="card-body collapse show" id="contact" data-parent="#checkout">
+                    <div class="form-group">
+                        <label asp-for="ContactEmail"></label>
+                        @if (string.IsNullOrEmpty(Model.ContactEmail))
+                        {
+                            <input type="email" asp-for="ContactEmail" class="form-control" required placeholder="Email Address" />
+                        }
+                        else
+                        {
+                            <input type="email" asp-for="ContactEmail" class="form-control" disabled />
+                            <input type="hidden" asp-for="ContactEmail" />
+                        }
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ContactPhoneNumber"></label>
+                        @if (string.IsNullOrEmpty(Model.ContactPhoneNumber))
+                        {
+                            <input type="tel" asp-for="ContactPhoneNumber" class="form-control" required placeholder="Phone Number" />
+                        }
+                        else
+                        {
+                            <input type="tel" asp-for="ContactPhoneNumber" class="form-control" disabled />
+                            <input type="hidden" asp-for="ContactPhoneNumber" />
+                        }
+                    </div><button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#shipping">Next</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header" data-toggle="collapse" data-target="#shipping">
+                    <h5 class="card-title">Shipping</h5>
+                </div>
+                <div class="card-body collapse" id="shipping" data-parent="#checkout">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        @foreach (var savedAddress in Model.Addresses)
+                        {
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" asp-for="SavedAddressId" value="@savedAddress.Id">
+                                <label class="form-check-label" asp-for="SavedAddressId">
+                                    @savedAddress.StreetAddress @savedAddress.ExtendedAddress @savedAddress.Locality @savedAddress.Region @savedAddress.PostalCode
+                                </label>
+                            </div>
+                        }
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" asp-for="SavedAddressId" value="" checked>
+                            <label class="form-check-label" asp-for="SavedAddressId">
+                                New Address:
+                            </label>
+                        </div>
+                    }
+                    <div class="form-group">
+                        <label asp-for="ShippingAddressLine1"></label>
+                        <input type="text" asp-for="ShippingAddressLine1" required class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ShippingAddressLine2"></label>
+                        <input type="text" asp-for="ShippingAddressLine2" required class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ShippingLocale"></label>
+                        <input type="text" asp-for="ShippingLocale" required class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ShippingCountry"></label>
+                        <select asp-for="ShippingCountry" required class="form-control">
+
+                            <option value="Canada">Canada</option>
+                            <option value="United States of America">United States of America</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ShippingRegion"></label>
+                        <input type="text" asp-for="ShippingRegion" required class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ShippingPostalCode"></label>
+                        <input type="text" asp-for="ShippingPostalCode" required class="form-control" />
+                    </div>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" asp-for="SaveShippingAddress">
+                            <label class="form-check-label" asp-for="SaveShippingAddress">
+                            </label>
+                        </div>
+                    }
+                    <button class="btn btn-secondary" type="button" id="validateButton">Validate Address</button>
+                    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#billing">Next</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header" data-toggle="collapse" data-target="#billing">
+                    <h5 class="card-title">Billing</h5>
+                </div>
+                <div class="card-body collapse" id="billing" data-parent="#checkout">
+                    <div class="form-row">
+                        <div class="form-group col-8">
+                            <label asp-for="BillingCardNumber"></label>
+                            <input type="text" asp-for="BillingCardNumber" required class="form-control" maxlength="16" placeholder="e.g. 4111111111111111" />
+                        </div>
+                        <div class="form-group col-4">
+                            <label asp-for="BillingCardVerificationValue"></label>
+                            <input type="text" asp-for="BillingCardVerificationValue" required class="form-control" maxlength="3" placeholder="e.g. 123" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-8">
+                            <label asp-for="BillingNameOnCard"></label>
+                            <input type="text" asp-for="BillingNameOnCard" required class="form-control" placeholder="John Cardholder" />
+                        </div>
+                        <div class="form-group col-2">
+                            <label asp-for="BillingCardExpirationMonth"></label>
+                            <select asp-for="BillingCardExpirationMonth" class="form-control col" required>
+                                <option></option>
+                                @for (int i = 1; i <= 12; i++)
+                                {
+                                    <option value="@i">@i.ToString().PadLeft(2, '0')</option>
+
+                                }
+                            </select>
+
+                        </div>
+
+                        <div class="form-group col-2">
+                            <label>&nbsp;</label>
+                            <select asp-for="BillingCardExpirationYear" class="form-control col" required>
+                                <option></option>
+                                @for (int i = DateTime.Now.Year; i <= DateTime.Now.AddYears(6).Year; i++)
+                                {
+                                    <option value="@i">@i.ToString()</option>
+
+                                }
+                            </select>
+                        </div>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" asp-for="SaveBillingCard">
+                                <label class="form-check-label" asp-for="SaveBillingCard">
+                                </label>
+                            </div>
+                        }
+                    </div>
+                    <button class="btn btn-primary">Place Order</button>
+                </div>
+            </div>
+
+
+        </form>
+    </div>
+    <div class="col-4">
+        <table class="table table-dark">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var cartItem in Model.Cart.CartItems)
+                {
+                    <tr>
+                        <td>@cartItem.Product.Name</td>
+                        <td>@((cartItem.Product.Price ?? 0).ToString("c"))</td>
+                        <td>@cartItem.Quantity</td>
+                        <td>@((cartItem.Quantity * (cartItem.Product.Price ?? 0)).ToString("c"))</td>
+                    </tr>
+
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="3">Subtotal</th>
+
+                    <th>@(Model.Cart.CartItems.Sum(x => x.Quantity * (x.Product.Price ?? 0)).ToString("c"))</th>
+                </tr>
+                <tr>
+                    <th colspan="3">Tax</th>
+                    <th>$0.00</th>
+                </tr>
+                <tr>
+                    <th colspan="3">Shipping</th>
+                    <th>$0.00</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $('document').ready(() => {
+            $('input, select').blur(() => {
+                var inputs = $('#checkout input, #checkout select');
+                var formInputCount = inputs.length;
+                var filledInputs = inputs.filter((i, e) => {
+                    return $(e).val().length > 0;
+                }).length;
+                $(".progress-bar").width(((filledInputs / formInputCount) * 100) + "%");
+            })
+
+            $('input[name=SavedAddressId]', '#checkout').change(() => {
+
+                if ($('input[name=SavedAddressId]:checked', '#checkout').val().length > 0) {
+                    console.log('disable');
+                    $('#shipping').find('input[type = text], input[type = checkbox], select').prop('disabled', true);
+
+                } else {
+
+                    console.log('enable');
+                    $('#shipping').find('input[type = text], input[type = checkbox], select').prop('disabled', false);
+                }
+
+
+            });
+
+            $('#validateButton').click(() => {
+                console.log("Validate clicked");
+                var addressLine1 = $('#ShippingAddressLine1').val();
+                var addressLine2 = $('#ShippingAddressLine2').val();
+                var locale = $('#ShippingLocale').val();
+
+                var region = $('#ShippingRegion').val();
+                var country = $('#ShippingCountry').val();
+                var postalCode = $('#ShippingPostalCode').val();
+                var url = '/Checkout/ValidateAddress?'
+                if (addressLine1) {
+                    url += ('addressLine1=' + addressLine1 + '&')
+                }
+                if (addressLine2) {
+                    url += ('addressLine2=' + addressLine2 + '&')
+                }
+                if (region) {
+                    url += ('region=' + region + '&')
+                }
+                if (locale) {
+                    url += ('locale=' + locale + '&')
+                }
+                if (country) {
+                    url += ('country=' + country + '&')
+                }
+                if (postalCode) {
+                    url += ('postalCode=' + postalCode)
+                }
+
+                $.getJSON(url).then((response) => {
+                    $('#ShippingAddressLine1').val(response[0].addressLine1).addClass('is-valid');
+                    $('#ShippingAddressLine2').val(response[0].addressLine2).addClass('is-valid');
+                    $('#ShippingLocale').val(response[0].locale).addClass('is-valid');
+                    $('#ShippingPostalCode').val(response[0].postalCode).addClass('is-valid');
+                    $('#ShippingRegion').val(response[0].region).addClass('is-valid');
+
+                    $()
+
+                });
+            })
+        });
+    </script>
+}
