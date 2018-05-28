@@ -65,6 +65,34 @@ namespace thissite
                     if (passwordResult.Succeeded)
                     {
 
+                        Braintree.CustomerSearchRequest search = new Braintree.CustomerSearchRequest();
+                        search.Email.Is(model.Email);
+                        var searchResult = await _braintreeGateway.Customer.SearchAsync(search);
+                        if (searchResult.Ids.Count == 0)
+                        {
+                            //Create  a new Braintree Customer
+                            await _braintreeGateway.Customer.CreateAsync(new Braintree.CustomerRequest
+                            {
+                                Email = model.Email,
+                                FirstName = model.FirstName,
+                                LastName = model.LastName,
+                                Phone = model.PhoneNumber
+                            });
+                        }
+                        else
+                        {
+
+                            //Update the existing Braintree customer
+                            Braintree.Customer existingCustomer = searchResult.FirstItem;
+                            await _braintreeGateway.Customer.UpdateAsync(existingCustomer.Id, new Braintree.CustomerRequest
+                            {
+                                FirstName = model.FirstName,
+                                LastName = model.LastName,
+                                Phone = model.PhoneNumber
+                            });
+                        }
+
+                        
                         var confirmationToken = await _signInManager.UserManager.GenerateEmailConfirmationTokenAsync(newUser);
 
                         confirmationToken = System.Net.WebUtility.UrlEncode(confirmationToken);

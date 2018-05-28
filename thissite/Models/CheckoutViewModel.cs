@@ -51,7 +51,7 @@ namespace thissite.Models
         public string BillingCardNumber { get; set; }
 
         [Required]
-        [Display(Name = "Expiration Date")]
+        //[Display(Name = "Expiration Date")]
         [Range(1, 12)]
         public int BillingCardExpirationMonth { get; set; }
 

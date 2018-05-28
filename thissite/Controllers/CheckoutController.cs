@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace thissite.Controllers
 {
     public class CheckoutController : Controller
@@ -176,6 +177,10 @@ namespace thissite.Controllers
                             savedAddress = newAddressResult.Target;
                         }
                     }
+                    else
+                    {
+
+                    }
 
                     TransactionRequest transaction = new TransactionRequest
                     {
@@ -243,7 +248,7 @@ namespace thissite.Controllers
 
         public IActionResult ValidateAddress(string addressLine1, string addressLine2, string region, string locale, string country, string postalCode)
         {
-            if (country == "United States of America")
+            if ((country == "United States of America") && (addressLine1.Length > 0) && (region.Length > 0) && (locale.Length > 0) && (postalCode.Length > 0))
             {
                 var lookup = new SmartyStreets.USStreetApi.Lookup
                 {
@@ -266,6 +271,7 @@ namespace thissite.Controllers
             }
             else
             {
+
                 return Json(new[]{ new {
                     AddressLine1 = addressLine1,
                     AddressLine2 = addressLine2,

@@ -50,6 +50,7 @@ namespace thissite
                     });
 
             services.AddTransient((x) => { return new EmailService(Configuration["SendGridKey"]); });
+
             services.AddTransient((x) => {
                 return new Braintree.BraintreeGateway(
                     Configuration["BraintreeEnvironment"],
@@ -57,13 +58,15 @@ namespace thissite
                     Configuration["BraintreePublicKey"],
                     Configuration["BraintreePrivateKey"]);
             });
+
             services.AddTransient((x) =>
             {
                 SmartyStreets.ClientBuilder builder = new SmartyStreets.ClientBuilder(
-                    Configuration["d6eaef69-4aa6-912c-d242-490f76ffe875"], 
-                    Configuration["50dtHlWwG86EmKAYQ8BK"]);
+                    Configuration["SmartyStreetsAuthID"], 
+                    Configuration["SmartStreetsAuthToken"]);
                 return builder.BuildUsStreetApiClient();
             });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
