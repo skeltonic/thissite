@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using thissite.Models;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+
 
 namespace thissite.Controllers
 {
@@ -22,6 +24,7 @@ namespace thissite.Controllers
         }
 
         // GET: ProductsAdmin
+        
         public async Task<IActionResult> Index()
         {
             return View(await _context.Products.ToListAsync());

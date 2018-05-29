@@ -19,15 +19,22 @@ namespace thissite
         EmailService _emailService;
         BraintreeGateway _braintreeGateway;
         private ThisSiteDbContext _thisSiteDbContext;
-        
 
+        private RoleManager<IdentityRole> RoleManager;
         //using Microsoft.AspNetCore.Identity
-        public AccountController(SignInManager<ThisSiteUser> signInManager, EmailService emailService, BraintreeGateway braintreeGateway, ThisSiteDbContext thisSiteDbContext)
+        public AccountController(
+            SignInManager<ThisSiteUser> signInManager, 
+            EmailService emailService, 
+            BraintreeGateway braintreeGateway, 
+            ThisSiteDbContext thisSiteDbContext, 
+            RoleManager<IdentityRole> roleManager
+            )
         {
             this._signInManager = signInManager;
             this._emailService = emailService;
             _braintreeGateway = braintreeGateway;
             this._thisSiteDbContext = thisSiteDbContext;
+            
         }
 
         public IActionResult Index()
@@ -64,7 +71,18 @@ namespace thissite
                     IdentityResult passwordResult = await this._signInManager.UserManager.AddPasswordAsync(newUser, model.Password);
                     if (passwordResult.Succeeded)
                     {
-
+                        //If Admin does not exist, newUser becomes Admin
+                        if (!await RoleManager.RoleExistsAsync("Admin"))
+                        {
+                            var users = new IdentityRole("Admin");
+                            var res = await RoleManager.CreateAsync(users);
+                            if (res.Succeeded)
+                            {
+                                await _signInManager.UserManager.AddToRoleAsync(newUser, "Admin");
+                            }
+                        }
+                        
+                        //Search for Braintree Customer
                         Braintree.CustomerSearchRequest search = new Braintree.CustomerSearchRequest();
                         search.Email.Is(model.Email);
                         var searchResult = await _braintreeGateway.Customer.SearchAsync(search);
@@ -97,6 +115,7 @@ namespace thissite
 
                         confirmationToken = System.Net.WebUtility.UrlEncode(confirmationToken);
 
+                        //Send email verification to new user
                         string currentUrl = Request.GetDisplayUrl();    //This will get me the URL for the current request
                         System.Uri uri = new Uri(currentUrl);   //This will wrap it in a "URI" object so I can split it into parts
                         string confirmationUrl = uri.GetLeftPart(UriPartial.Authority); //This gives me just the scheme + authority of the URI
@@ -137,6 +156,7 @@ namespace thissite
         public async Task<IActionResult> SignOut()
         {
             await this._signInManager.SignOutAsync();
+            //Delete cart when user signs out
             Response.Cookies.Delete("cartId");
             return RedirectToAction("Index", "Home");
         }
@@ -157,6 +177,7 @@ namespace thissite
                 ThisSiteUser existingUser = await this._signInManager.UserManager.FindByNameAsync(model.UserName);
                 if (existingUser != null)
                 {
+                    //To enable password failure to trigger a lockout, set true.  To disable, set false.
                     Microsoft.AspNetCore.Identity.SignInResult passwordResult = await this._signInManager.CheckPasswordSignInAsync(existingUser, model.Password, false);
                     if (passwordResult.Succeeded)
                     {
@@ -167,6 +188,11 @@ namespace thissite
                     {
                         ModelState.AddModelError("PasswordIncorrect", "Username or Password is incorrect.");
                     }
+                    if (passwordResult.IsLockedOut)
+                    {
+                        ModelState.AddModelError("PasswordIncorrect", "User account is locked");
+                        return RedirectToAction(nameof(Lockout));
+                    }
                 }
                 else
                 {
@@ -174,6 +200,12 @@ namespace thissite
 
                 }
             }
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Lockout()
+        {
             return View();
         }
 
@@ -247,8 +279,21 @@ namespace thissite
                 return RedirectToAction("Index", "Home");
             }
             return BadRequest();
-
-
         }
+
+        [HttpGet]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
+
+
+
+
+
+
+
+
     }
 }
