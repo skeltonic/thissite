@@ -7,6 +7,9 @@ using thissite.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using Microsoft.Extensions.Configuration;
+
 
 
 namespace thissite.Controllers
@@ -52,10 +55,6 @@ namespace thissite.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
-
-
-
-
             return View(model);
         }
 
@@ -82,8 +81,9 @@ namespace thissite.Controllers
                 }
             }
             model.Cart = cart;
-
         }
+
+
 
         [ValidateAntiForgeryToken]
         [HttpPost]
@@ -225,14 +225,33 @@ namespace thissite.Controllers
                     var transactionResult = await _brainTreeGateway.Transaction.SaleAsync(transaction);
                     if (transactionResult.IsSuccess())
                     {
-
-
-
                         _thisSiteDbContext.Orders.Add(newOrder);
                         _thisSiteDbContext.CartItems.RemoveRange(model.Cart.CartItems);
                         _thisSiteDbContext.Carts.Remove(model.Cart);
                         await _thisSiteDbContext.SaveChangesAsync();
-                        //Try to checkout
+                        //Try to checkout                        
+                        //Confirmation Email
+                        //TODO: var serOrder serializes user order.  I want to parse this JSON and send to SendGrid template for custom receipt
+                        /*var serOrder = JsonConvert.SerializeObject(newOrder, Formatting.Indented, 
+                            new JsonSerializerSettings
+                            {
+                                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                            });
+                        */
+
+
+                        var user = model.ContactEmail;
+                        var orderCompleteSubject = "Order #" + newOrder.TrackingNumber + " Completed";
+                        var htmlContent = "Thanks for placing your order with us! Please reference your order number above.";
+                        var plainTextContent = "Thanks for placing your order with us! Please reference your order number above.";
+
+                        var emailResult = await _emailService.SendEmailAsync(user, orderCompleteSubject, htmlContent, plainTextContent);
+                        //await _emailService.SendEmailAsync(user, orderCompleteSubject, htmlContent, plainTextContent);                        
+                        if (!emailResult.Success)
+                        {
+                            throw new Exception(string.Join(',', emailResult.Errors.Select(x => x.Message)));
+
+                        }
                         Response.Cookies.Delete("cartId");
                         return RedirectToAction("Index", "Receipt", new { id = newOrder.TrackingNumber });
                     }
@@ -241,6 +260,7 @@ namespace thissite.Controllers
                     {
                         ModelState.AddModelError("BillingCardNumber" + i, transactionResult.Errors.All()[i].Message);
                     }
+
                 }
             }
             return View(model);

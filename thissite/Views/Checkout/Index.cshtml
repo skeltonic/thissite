@@ -9,14 +9,16 @@
     <div class="row">
         <div class="col-md">
             <div class="progress">
+                @*TODO: Complete Progress bar*@
                 <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
             <div asp-validation-summary="All"></div>
             <form method="post" id="checkout">
+                @*Contact Section*@
                 <div class="card">
                     <div class="card-header" data-toggle="collapse" data-target="#contact">
                         <h5 class="card-title">Contact</h5>
-                    </div>
+                    </div>                    
                     <div class="card-body collapse show" id="contact" data-parent="#checkout">
                         <div class="form-group">
                             <label asp-for="ContactEmail"></label>
@@ -44,7 +46,8 @@
                         </div><button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#shipping">Next</button>
                     </div>
                 </div>
-                <div class="card">
+                @*Shipping Section*@
+                <div class="card">                    
                     <div class="card-header" data-toggle="collapse" data-target="#shipping">
                         <h5 class="card-title">Shipping</h5>
                     </div>
@@ -58,7 +61,8 @@
                                     New Address:
                                 </label>
                             </div>
-                            @foreach (var savedAddress in Model.Addresses)
+                            @*WARNING: Code only allows for one saved address - if user has multiple and selects one, order will not submit.*@
+                            @foreach (var savedAddress in Model.Addresses) 
                             {
 
                                 <div class="form-check">
@@ -99,9 +103,8 @@
 
                             }
 
-                        }
-                        @*Begin Unsaved Address Form*@
-                        <div class="newaddressfields">
+                        }                        
+                        <div class="newaddressfields"> @*Unsaved Address Info*@
                             <div class="form-group">
                                 <label asp-for="ShippingAddressLine1"></label>
                                 <input type="text" asp-for="ShippingAddressLine1" required class="form-control" />
@@ -148,6 +151,7 @@
                     </div>
 
                 </div>
+                @*Billing Section*@
                 <div class="card">
                     <div class="card-header" data-toggle="collapse" data-target="#billing">
                         <h5 class="card-title">Billing</h5>
@@ -208,6 +212,7 @@
 
             </form>
         </div>
+        @*Summary Table Section*@
         <div class="col-sm">
             <table class="table table-dark">
                 <thead>
@@ -254,7 +259,6 @@
     <script type="text/javascript">
         $('document').ready(() => {
 
-
             var SavedAddFields = $(".savedaddressfields")
             var NewAddFields = $(".newaddressfields")
             var ShippingParent = $("#shipping")
@@ -270,8 +274,6 @@
                 OneShipButton.detach();
                 ShippingParent.append(NewAddFields)
                 ShippingParent.append(BothShipButtons);
-
-
             });
 
             $('#UseSavedAddress').click(() => {
@@ -281,8 +283,6 @@
                 ShippingParent.append(SavedAddFields);
                 ShippingParent.append(OneShipButton);
             });
-
-
 
 
 

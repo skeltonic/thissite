@@ -45,6 +45,7 @@ namespace thissite.Controllers
 
         public async Task<IActionResult> CartSummary()
         {
+            
             Guid cartId;
             Cart cart = null;
             if (Request.Cookies.ContainsKey("cartId"))
@@ -64,6 +65,10 @@ namespace thissite.Controllers
             return Json(cart);
         }
 
- 
+        public async Task<IActionResult> Search(string id)
+        {
+            return Json(_db.Products.Where(x => x.Description.Contains(id) || x.Name.Contains(id)).ToList());
+        }
+
     }
 }

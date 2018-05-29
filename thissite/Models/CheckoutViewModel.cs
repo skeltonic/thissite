@@ -19,23 +19,25 @@ namespace thissite.Models
 
         public Cart Cart { get; set; }
 
+        [Required]
         [Display(Name = "Address")]
         public string ShippingAddressLine1 { get; set; }
 
         [Display(Name = "Apartment/Unit/Suite")]
         public string ShippingAddressLine2 { get; set; }
 
+        [Required]
         [Display(Name = "City")]
         public string ShippingLocale { get; set; }
-
-
-
+        
+        [Required]
         [Display(Name = "State")]
         public string ShippingRegion { get; set; }
 
         [Display(Name = "Country")]
         public string ShippingCountry { get; set; }
 
+        [Required]
         [Display(Name = "Zip Code")]
         public string ShippingPostalCode { get; set; }
 

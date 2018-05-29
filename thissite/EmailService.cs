@@ -37,7 +37,6 @@ namespace thissite
         {
 
             var from = new SendGrid.Helpers.Mail.EmailAddress("admin@thissitesucks.com", "This Site Sucks");
-
             var to = new SendGrid.Helpers.Mail.EmailAddress(recipient);
             var message = SendGrid.Helpers.Mail.MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
             message.SetTemplateId("00d2976e-dc01-4402-9090-860f33bd424d");

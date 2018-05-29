@@ -27,6 +27,7 @@ namespace thissite.Models
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> Orderitems { get; set; }
 
+
     }
 
     public class ThisSiteUser : IdentityUser

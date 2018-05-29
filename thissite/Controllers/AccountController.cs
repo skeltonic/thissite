@@ -137,11 +137,13 @@ namespace thissite
         public async Task<IActionResult> SignOut()
         {
             await this._signInManager.SignOutAsync();
+            Response.Cookies.Delete("cartId");
             return RedirectToAction("Index", "Home");
         }
 
         public IActionResult SignIn()
         {
+            
             return View();
         }
 

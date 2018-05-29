@@ -1,7 +1,32 @@
-﻿
+﻿@model thissite.Models.Order
 @{
     ViewData["Title"] = "Index";
 }
 
-<h2>Index</h2>
+<div class="jumbotron text-xs-center">
+    <h1 class="display-4">Thank you for your order!</h1>
+    <p class="lead">Your order number is <strong>@Model.TrackingNumber</strong>. 
+    <p><strong>Please check your email</strong> for order details.</p>
+    <hr>
+    <table class="table table-striped">
+        @foreach (var OrderItem in Model.OrderItems)
+        {
+            <tr>
+                <td>@OrderItem.ProductName </td>
+                <td>@OrderItem.ProductPrice</td>
+                <td>@OrderItem.Quantity</td>
+            </tr>
+        }
+    </table>
+
+
+    <p>
+        Having trouble? <a asp-action="contact" asp-controller="home">Contact Us</a>
+    </p>
+    <p class="lead">
+        <a asp-action="index" asp-controller="home" class="btn btn-primary">Now go home!</a>
+    </p>
+</div>
+
+
 

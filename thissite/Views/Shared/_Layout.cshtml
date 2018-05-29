@@ -20,6 +20,9 @@
                     <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" asp-area="" asp-controller="SiteReviews" asp-action="Index">Rate a page!</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" asp-controller="Product" asp-action="Index">Shop</a>
                 </li>
                 <li class="nav-item">
@@ -28,25 +31,26 @@
                 <li class="nav-item">
                     <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Contact">Contact</a>
                 </li>
+
+                @if (!User.Identity.IsAuthenticated)
+    {
+            <li class="nav-item">
+                <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Register">Sign Up</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-area="" asp-controller="Account" asp-action="SignIn">Sign In</a>
+            </li>
+}
+else
+{
+            <li class="nav-item">
+                <a class="nav-link" asp-area="" asp-controller="Account" asp-action="SignOut">Sign Out as @User.Identity.Name</a>
+            </li>
+
+}
                 <li class="nav-item">
                     <a class="nav-link" asp-area="" asp-controller="Cart" asp-action="Index"><span id="cartBadge" class="badge badge-primary">0</span>Cart</a>
                 </li>
-                @if (!User.Identity.IsAuthenticated)
-                {
-                    <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Register">Sign Up</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Account" asp-action="SignIn">Sign In</a>
-                    </li>
-                }
-                else
-                {
-                    <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Account" asp-action="SignOut">Sign Out as @User.Identity.Name</a>
-                    </li>
-
-                }
 
             </ul>
         </div>
