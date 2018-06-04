@@ -1,9 +1,12 @@
 ﻿@model Cart
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Cart Full of Joy";
 }
 
-<h2>Index</h2>
+<div class="results titantext add-padd borders">
+    <h2 class="header">Here's What You've Got</h2>
+</div>
+
 @if (Model.CartItems.Count == 0)
 {
     <p>You have no items in your cart!</p>

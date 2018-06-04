@@ -81,6 +81,12 @@ namespace thissite
                                 await _signInManager.UserManager.AddToRoleAsync(newUser, "Admin");
                             }
                         }
+                        //Create Member role
+                        else
+                        {
+                            await _signInManager.UserManager.AddToRoleAsync(newUser, "Member");
+                        }
+                        
                         
                         //Search for Braintree Customer
                         Braintree.CustomerSearchRequest search = new Braintree.CustomerSearchRequest();

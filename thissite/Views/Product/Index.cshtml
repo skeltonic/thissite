@@ -1,22 +1,39 @@
-﻿@model IEnumerable<Product>
+﻿@model IEnumerable<Product>;
+
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Buy Things. Attain Actualization.";
 }
-<h2>Showing @Model.Count() Products</h2>
-<div class="row">
+<div class="results titantext add-padd borders">
+    <h2 class="header">Showing @Model.Count() Products</h2>
+</div>
+
+<div class="parentproductcontainer">
     @foreach (var product in Model)
     {
-        <div class="col-sm-12 col-md-4">
-            <h3>@product.Name</h3>
-            <img class="img-fluid" src="@product.Image" alt="@product.Name" />
-            <p>@product.Description</p>
-            <h4>@(product.Price.HasValue ? product.Price.Value.ToString("C") : "No Price")</h4>
-            <a class="btn btn-primary" asp-controller="Product" asp-action="Details" asp-route-id="@product.ID">View This Product</a>
-            <form method="post" asp-action="Details">
-                <input name="ID" value="@product.ID" type="hidden" />
-                <input type="submit" class="btn btn-primary" value="Add to Cart" />
-            </form>
+        <div class="productcontainer borders">
+            <div class="productimagecontainer">
+                <img class="productimage borders" src="@product.Image" alt="@product.Name" />
+            </div>
+            <div class="productbody">
+                <h5 class="card-title">@product.Name</h5>
+                <p class="card-text">@product.Description</p>
+            </div>
+            <div class="productfooter">
+                <h4 class="productfooterprice">@(product.Price.HasValue ? @product.Price.Value.ToString("C") : "No Price")</h4>
+                <div class="productfooterbuttons">
+                    <div>
+                        <a class="btn btn-primary" asp-controller="Product" asp-action="Details" asp-route-id="@product.ID"> View This Product </a>
+                    </div>
+                    <div>
+                        <form method="post" asp-action="Details">
+                            <input name="ID" value="@product.ID" type="hidden" />
+                            <input type="submit" class="btn btn-primary" value="Add to Cart" />
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-
     }
 </div>
+
+

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using thissite.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-
+using Microsoft.AspNetCore.Authorization;
 
 namespace thissite.Controllers
 {
